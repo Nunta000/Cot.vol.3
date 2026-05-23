@@ -1,731 +1,486 @@
 <!DOCTYPE html>
-
 <html lang="ja">
-
 <head>
-
     <meta charset="UTF-8">
-
     <meta name="robots" content="noindex,nofollow">
-
     
-
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
     <title>こどもも大人も楽しめる！ Musical Concert vol.3</title>
-
     <link rel="preconnect" href="https://fonts.googleapis.com">
-
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-
     <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;700&display=swap" rel="stylesheet">
-
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-
     
-
     <style>
-
         /* 全体の基本デザイン */
-
         body {
-
             font-family: 'M PLUS Rounded 1c', sans-serif;
-
             background-color: #f7fbe7; /* チラシのような優しい黄緑・クリーム系 */
-
             color: #333;
-
             margin: 0;
-
             padding: 0;
-
         }
-
         
-
         /* ヘッダー（一番上のタイトル部分） */
-
         header {
-
             background: linear-gradient(135deg, #e0f2fe, #fce7f3); /* 水色とピンクのグラデーション */
-
             text-align: center;
-
             padding: 40px 20px;
-
             border-bottom: 5px dashed #38bdf8;
-
         }
-
         header h1 {
-
             color: #0284c7;
-
             font-size: 2.5rem;
-
             margin: 10px 0;
-
         }
-
         header .sub-title {
-
             font-size: 1.5rem;
-
             color: #db2777;
-
             font-weight: bold;
-
         }
-
         header .date-place {
-
             background-color: white;
-
             display: inline-block;
-
             padding: 15px 30px;
-
             border-radius: 20px;
-
             box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-
             margin-top: 15px;
-
             font-size: 1.2rem;
-
             font-weight: bold;
-
         }
-
-
 
         /* ⏱️ カウントダウンタイマーのスタイル */
-
         .countdown-container {
-
             background: #fff9c4;
-
             padding: 15px 25px;
-
             border-radius: 50px;
-
             display: inline-flex;
-
             justify-content: center;
-
             gap: 15px;
-
             margin-top: 20px;
-
             box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-
             border: 3px dashed #fbc02d;
-
         }
-
         .timer-item { text-align: center; min-width: 60px; }
-
         .timer-item .num { font-size: 2rem; font-weight: bold; color: #d35400; display: block; }
-
         .timer-item .label { font-size: 0.7rem; color: #7f8c8d; font-weight: bold; }
-
         .timer-message { font-size: 1.1rem; color: #e67e22; font-weight: bold; margin-top: 8px; }
 
+        /* 📣 当日・終了後のお知らせ枠 */
+        .announcement-box {
+            display: none;
+            max-width: 600px;
+            margin: 25px auto 0 auto;
+            padding: 20px;
+            border-radius: 25px;
+            font-size: 1.3rem;
+            font-weight: bold;
+            box-shadow: 0 6px 12px rgba(0,0,0,0.08);
+            animation: popIn 0.5s ease-out;
+        }
+        .announcement-box.today {
+            display: block;
+            background-color: #fff3e0;
+            border: 4px dashed #ff9800;
+            color: #e65100;
+        }
+        .announcement-box.ended {
+            display: block;
+            background-color: #f3e5f5;
+            border: 4px dashed #9c27b0;
+            color: #4a148c;
+        }
 
+        /* 🎫 完売（予定枚数終了）の可愛い案内枠 */
+        .announcement-box.soldout {
+            display: block;
+            background-color: #ffeae6;
+            border: 4px dashed #f44336;
+            color: #c62828;
+        }
+        .soldout-title {
+            font-size: 1.5rem;
+            margin-bottom: 5px;
+            display: block;
+        }
+        .soldout-sub {
+            font-size: 1rem;
+            font-weight: normal;
+            opacity: 0.9;
+        }
+
+        /* フッター用の完売バッジ */
+        .soldout-footer-box {
+            display: none;
+            background-color: #ffeae6;
+            color: #d32f2f;
+            border: 3px dashed #f44336;
+            padding: 15px 30px;
+            border-radius: 40px;
+            font-size: 1.3rem;
+            font-weight: bold;
+            margin-top: 20px;
+            display: inline-block;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+
+        @keyframes popIn {
+            0% { transform: scale(0.9); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
 
         /* コンテンツの枠組み */
-
         .container {
-
             max-width: 900px;
-
             margin: 0 auto;
-
             padding: 20px;
-
         }
-
-
 
         /* セクション共通 */
-
         section {
-
             background: white;
-
             border-radius: 20px;
-
             padding: 30px;
-
             margin-bottom: 30px;
-
             box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-
         }
-
         h2 {
-
             text-align: center;
-
             color: #0284c7;
-
             border-bottom: 3px dotted #38bdf8;
-
             padding-bottom: 10px;
-
             margin-top: 0;
-
         }
-
-
 
         /* 2つの部のレイアウト */
-
         .concert-parts {
-
             display: grid;
-
             grid-template-columns: 1fr 1fr;
-
             gap: 20px;
-
         }
-
         @media (max-width: 768px) {
-
             .concert-parts { grid-template-columns: 1fr; }
-
         }
-
         .part-card {
-
             padding: 20px;
-
             border-radius: 15px;
-
             position: relative;
-
         }
-
         .hiru { background-color: #ecfdf5; border: 3px solid #10b981; }
-
         .gogo { background-color: #fffbeb; border: 3px solid #f59e0b; }
-
         .badge {
-
             background-color: #ef4444;
-
             color: white;
-
             padding: 5px 10px;
-
             border-radius: 10px;
-
             font-weight: bold;
-
             display: inline-block;
-
             margin-bottom: 10px;
-
         }
-
-
 
         /* プログラムリスト */
-
         .program-list {
-
             list-style: none;
-
             padding: 0;
-
             font-size: 1.1rem;
-
             line-height: 1.8;
-
         }
-
         .program-list li {
-
             padding: 10px;
-
             background: #f8fafc;
-
             margin-bottom: 8px;
-
             border-radius: 8px;
-
             border-left: 5px solid #38bdf8;
-
         }
-
-
 
         /* 📑 アコーディオンのスタイル */
-
         .accordion-container {
-
             display: flex;
-
             flex-direction: column;
-
             gap: 15px;
-
             margin-top: 20px;
-
         }
-
         details {
-
             background: #f8fafc;
-
             border-radius: 12px;
-
             border: 2px solid #e2e8f0;
-
             overflow: hidden;
-
             transition: all 0.3s ease;
-
         }
-
         details[open] {
-
             border-color: #3498db;
-
             box-shadow: 0 5px 15px rgba(52,152,219,0.1);
-
         }
-
         summary {
-
             padding: 15px 25px;
-
             font-size: 1.2rem;
-
             font-weight: bold;
-
             cursor: pointer;
-
             list-style: none;
-
             display: flex;
-
             align-items: center;
-
             justify-content: space-between;
-
             background: #fff;
-
         }
-
         summary::after {
-
             content: '\f078';
-
             font-family: "Font Awesome 6 Free";
-
             font-weight: 900;
-
             font-size: 1rem;
-
             color: #3498db;
-
             transition: transform 0.3s;
-
         }
-
         details[open] summary::after {
-
             transform: rotate(180deg);
-
         }
-
         .profile-content {
-
             padding: 20px 25px;
-
             border-top: 1px solid #e2e8f0;
-
             background: #fff;
-
             font-size: 1rem;
-
             line-height: 1.6;
-
         }
-
         .profile-content strong {
-
             color: #2980b9;
-
         }
-
-
 
         /* フッター（お問い合わせ） */
-
         footer {
-
             background-color: #15803d;
-
             color: white;
-
             text-align: center;
-
             padding: 30px 20px;
-
             margin-top: 50px;
-
         }
-
         .btn {
-
             display: inline-block;
-
             background-color: #e11d48;
-
             color: white;
-
             padding: 15px 35px;
-
             border-radius: 40px;
-
             text-decoration: none;
-
             font-size: 1.3rem;
-
             font-weight: bold;
-
             margin-top: 20px;
-
             box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-
             transition: background-color 0.2s, transform 0.2s;
-
             border: 2px solid white;
-
         }
-
         .btn:hover {
-
             background-color: #be123c;
-
             transform: scale(1.05);
-
         }
-
     </style>
-
 </head>
-
 <body>
 
-
-
     <header>
-
         <div class="sub-title">こどもも大人も楽しめる！</div>
-
         <h1>Musical Concert vol.3</h1>
-
         <div class="date-place">
-
             📅 2026年9月5日（土）<br>
-
             📍 大泉学園ゆめりあホール
-
         </div>
-
         <br>
-
-        <div class="countdown-container">
-
-            <div class="timer-item"><span class="num" id="days">00</span><span class="label">DAYS</span></div>
-
-            <div class="timer-item"><span class="num" id="hours">00</span><span class="label">HOURS</span></div>
-
-            <div class="timer-item"><span class="num" id="mins">00</span><span class="label">MINS</span></div>
-
-            <div class="timer-item"><span class="num" id="secs">00</span><span class="label">SECS</span></div>
-
+        
+        <div id="timer-area">
+            <div class="countdown-container">
+                <div class="timer-item"><span class="num" id="days">00</span><span class="label">DAYS</span></div>
+                <div class="timer-item"><span class="num" id="hours">00</span><span class="label">HOURS</span></div>
+                <div class="timer-item"><span class="num" id="mins">00</span><span class="label">MINS</span></div>
+                <div class="timer-item"><span class="num" id="secs">00</span><span class="label">SECS</span></div>
+            </div>
+            <div class="timer-message">コンサート当日まであと...ワクワク！</div>
         </div>
 
-        <div class="timer-message">コンサート当日まであと...ワクワク！</div>
-
+        <div id="status-message" class="announcement-box"></div>
     </header>
-
-
 
     <div class="container">
 
-
-
         <section>
-
             <h2>えらべる２つの部 🎵</h2>
-
             <div class="concert-parts">
-
                 <div class="part-card hiru">
-
                     <span class="badge">0歳からOK！👶</span>
-
                     <h3>おひるの部 12:30開演</h3>
-
                     <p>（12:00開場 / 休憩なし 50分のコンサート）</p>
-
                     <hr>
-
                     <p><strong>チケット料金（全席自由）：</strong><br>
-
                     大人前売り：1,800円（当日2,000円）<br>
-
                     小学生以下：500円 / 中高大生：1,000円<br>
-
                     ※おひざの上 0〜2歳無料（座席が必要な場合は有料）</p>
-
                     <small>🍼 ホール建物内 5Fに授乳室、6Fにおむつ交換スペースがあります！</small>
-
                 </div>
-
                 
-
                 <div class="part-card gogo">
-
                     <span class="badge" style="background-color: #f59e0b;">4歳から入場OK！👧</span>
-
                     <h3>午後の部 14:30開演</h3>
-
                     <p>（14:00開場 / 休憩なし 75分のコンサート）</p>
-
                     <hr>
-
                     <p><strong>チケット料金（全席自由）：</strong><br>
-
                     大人前売り：3,000円（当日3,300円）<br>
-
                     小学生以下：1,000円 / 中高大生：1,500円</p>
-
                 </div>
-
             </div>
-
         </section>
 
-
-
         <section>
-
             <h2>プログラム 🎼</h2>
-
             <p style="text-align: center;">ディズニー音楽の数々とミュージカルナンバーをお楽しみ下さい。</p>
-
             <ul class="program-list">
-
                 <li>🧸 <strong>「トイ・ストーリー」より</strong> 君はともだち</li>
-
                 <li>🧞‍♂️ <strong>「アラジン」より</strong> ホール・ニュー・ワールド ほか</li>
-
                 <li>⛰️ <strong>「サウンド・オブ・ミュージック」より</strong> 私のお気に入り</li>
-
                 <li>🍎 <strong>「白雪姫」メドレー</strong> （マリンバソロ）</li>
-
                 <li>🗡️ <strong>「ゴースト＆レディ」より</strong> 不思議な絆</li>
-
             </ul>
-
         </section>
-
-
 
         <section>
-
             <h2>演奏者のしょうかい ✨</h2>
-
             <p style="text-align: center; color: #7f8c8d; font-size: 0.9rem;">
-
                 名前をえらぶと、くわしいプロフィールがパッとひらくよ！
-
             </p>
-
             
-
             <div class="accordion-container">
-
                 <details open>
-
                     <summary><span>👨 伊藤 謙吉（バリトン / 俳優）</span></summary>
-
                     <div class="profile-content">
-
                         東京音楽大学声楽演奏家コース卒業、同大学院声楽専攻修了。<br>
-
                         大学院在学中に劇団四季のオーディションに合格し、10年間在籍。<br>
-
                         「オペラ座の怪人」等に出演。「美女と野獣」「ライオンキング」等のレコーディングにも参加。退団後は歌唱講師やライブコンサート等の活動も始める。
-
                     </div>
-
                 </details>
 
-
-
                 <details>
-
                     <summary><span>👩 吉川 恭子（メゾソプラノ / 俳優）</span></summary>
-
                     <div class="profile-content">
-
                         昭和音楽芸術学院ミュージカル科卒業。劇団四季37期卒業。<br>
-
                         退団後は劇団Stepsで主要キャストとして活躍。ボイストレーナーとしてもプロの俳優へレッスンを行っている。<br>
-
                         <strong>【主な出演歴】</strong>「レ・ミゼラブル」「ミス・サイゴン」「ピーターパン」「ライオンキング」ほか多数。
-
                     </div>
-
                 </details>
 
-
-
                 <details>
-
                     <summary><span>🥁 青木 菊美（マリンバ・パーカッション）</span></summary>
-
                     <div class="profile-content">
-
                         洗足学園音楽大学打楽器専攻を卒業。現在は東京パノラマパーカッションなどのアンサンブルや、スティールパン・マリンバのデュオなどで活動。学校公演やコンサートで各地で演奏している。
-
                     </div>
-
                 </details>
 
-
-
                 <details>
-
                     <summary><span>🎻 北島 綾乃（ヴィオラ）</span></summary>
-
                     <div class="profile-content">
-
                         国立音楽大学音楽学部器楽学科卒業。その後ヴィオラに転向。現在は室内楽, オーケストラ、ファミリーコンサート、アーティストのサポート、音楽教室講師など多方面で活躍中。
-
                     </div>
-
                 </details>
-
-
 
                 <details>
-
                     <summary><span>🎹 真木 恭子（ピアノ）</span></summary>
-
                     <div class="profile-content">
-
                         東京音楽大学音楽学部器楽専攻卒業。同大学研究生ピアノ伴奏者コース修了。幅広い年代へのピアノレッスン、本コンサートの企画など多方面で音楽活動を行っている。
-
                     </div>
-
                 </details>
-
             </div>
-
         </section>
-
-
 
     </div>
 
-
-
     <footer>
-
         <h3>お問合せ・チケットご予約 📞</h3>
-
         <p>ゆめりあホール5階 チケット販売窓口：03-5947-2351</p>
-
-        <p>メール：arai.piano88@gmail.com</p>
-
+        <p>メール：arai.piano88♪gmail.com（♪を@に変更してください）</p>
         <p>西武池袋線「大泉学園駅」北口より徒歩1分</p>
-
-        <a href="https://docs.google.com/forms/d/e/1FAIpQLScLtd5jUhDG_63vJ22cnKk7jyGKHp0vPzWA3YcMrWk7EgEeZg/viewform?usp=header" target="_blank" class="btn">
-
-            Googleフォームで予約する <i class="fa-solid fa-file-lines"></i>
-
-        </a>
-
+        
+        <div id="booking-area">
+            <a href="https://docs.google.com/forms/d/e/1FAIpQLScLtd5jUhDG_63vJ22cnKk7jyGKHp0vPzWA3YcMrWk7EgEeZg/viewform?usp=header" target="_blank" class="btn" id="booking-btn">
+                Googleフォームで予約する <i class="fa-solid fa-file-lines"></i>
+            </a>
+            <div id="soldout-footer" class="soldout-footer-box"> 予定枚数は終了いたしました（満員御礼）</div>
+        </div>
     </footer>
 
-
-
     <script>
-
-        const concertDate = new Date("September 5, 2026 12:30:00").getTime();
-
-        const updateTimer = () => {
-
-            const now = new Date().getTime();
-
-            const diff = concertDate - now;
-
-            if (diff > 0) {
-
-                const d = Math.floor(diff / (1000 * 60 * 60 * 24));
-
-                const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-
-                const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-
-                const s = Math.floor((diff % (1000 * 60)) / 1000);
-
-                document.getElementById("days").innerText = d.toString().padStart(2, '0');
-
-                document.getElementById("hours").innerText = h.toString().padStart(2, '0');
-
-                document.getElementById("mins").innerText = m.toString().padStart(2, '0');
-
-                document.getElementById("secs").innerText = s.toString().padStart(2, '0');
-
-            } else {
-
-                document.querySelector(".countdown-container").style.display = "none";
-
-                document.querySelector(".timer-message").innerText = "本日開催！または終了いたしました。";
-
-            }
-
-        };
-
-        setInterval(updateTimer, 1000);
-
-        updateTimer();
+        /* =======================================================
+         * ⚙️ ホームページの表示設定（ここで状況を切り替えます！）
+         * =======================================================
+         * "countdown" -> 通常時（カウントダウンタイマーを表示）
+         * "soldout"   -> 【新機能】予定枚数終了（タイマーを隠し、完売の可愛い案内を表示）
+         * "today"     -> 本日開催（当日券の案内を表示）
+         * "ended"     -> 公演終了（終了後の感謝メッセージを表示）
+         */
+        const pageMode = "countdown"; 
 
 
+        // --- 以下は自動で動くプログラムです（触らなくて大丈夫です！） ---
+        const msgBox = document.getElementById("status-message");
+        const timerArea = document.getElementById("timer-area");
+        const bookingBtn = document.getElementById("booking-btn");
+        const soldoutFooter = document.getElementById("soldout-footer");
 
+        // ページモードに応じた表示の切り替え
+        if (pageMode === "soldout") {
+            // タイマーと予約ボタンを隠す
+            timerArea.style.display = "none";
+            bookingBtn.style.display = "none";
+            
+            // 特設の可愛い完売案内を上部と下部に出す
+            msgBox.className = "announcement-box soldout";
+            msgBox.innerHTML = "<span class='soldout-title'> 予定枚数は終了いたしました </span><span class='soldout-sub'>満員御礼！たくさんのご予約ありがとうございました。</span>";
+            soldoutFooter.style.display = "inline-block";
+            
+        } else if (pageMode === "today") {
+            timerArea.style.display = "none";
+            soldoutFooter.style.display = "none";
+            msgBox.className = "announcement-box today";
+            msgBox.innerHTML = "本日開催！<br>ゆめりあホール6階にて当日券を販売しております。";
+            
+        } else if (pageMode === "ended") {
+            timerArea.style.display = "none";
+            bookingBtn.style.display = "none";
+            soldoutFooter.style.display = "none";
+            msgBox.className = "announcement-box ended";
+            msgBox.innerHTML = "公演は終了いたしました。<br>ご来場くださり、誠にありがとうございました！";
+            
+        } else {
+            // 通常のカウントダウンタイマーの処理
+            soldoutFooter.style.display = "none";
+            const concertDate = new Date("September 5, 2026 12:30:00").getTime();
+            const updateTimer = () => {
+                const now = new Date().getTime();
+                const diff = concertDate - now;
+                if (diff > 0) {
+                    const d = Math.floor(diff / (1000 * 60 * 60 * 24));
+                    const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                    const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                    const s = Math.floor((diff % (1000 * 60)) / 1000);
+                    document.getElementById("days").innerText = d.toString().padStart(2, '0');
+                    document.getElementById("hours").innerText = h.toString().padStart(2, '0');
+                    document.getElementById("mins").innerText = m.toString().padStart(2, '0');
+                    document.getElementById("secs").innerText = s.toString().padStart(2, '0');
+                } else {
+                    timerArea.style.display = "none";
+                    bookingBtn.style.display = "none";
+                    msgBox.className = "announcement-box ended";
+                    msgBox.innerHTML = "公演は終了いたしました。ご来場くださり、誠にありがとうございました！";
+                }
+            };
+            setInterval(updateTimer, 1000);
+            updateTimer();
+        }
+
+        // アコーディオンの制御
         const details = document.querySelectorAll("details");
-
         details.forEach((targetDetail) => {
-
             targetDetail.addEventListener("click", () => {
-
                 details.forEach((detail) => {
-
                     if (detail !== targetDetail) {
-
                         detail.removeAttribute("open");
-
                     }
-
                 });
-
             });
-
         });
-
     </script>
-
 </body>
-
 </html>
