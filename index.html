@@ -403,52 +403,84 @@
 
     <script>
         /* =======================================================
-         * ⚙️ ホームページの表示設定（ここで状況を切り替えます！）
+         * ⚙️ ホームページの表示設定（状況に応じて切り替えるスイッチ）
          * =======================================================
-         * "countdown" -> 通常時（カウントダウンタイマーを表示）
-         * "soldout"   -> 【新機能】予定枚数終了（タイマーを隠し、完売の可愛い案内を表示）
-         * "today"     -> 本日開催（当日券の案内を表示）
-         * "ended"     -> 公演終了（終了後の感謝メッセージを表示）
+         * "countdown" -> 通常時（日時に応じて自動で本日開催や終了モードに切り替わります！）
+         * "soldout"   -> 【完売時】手動でこれにすると、日時に関わらず「チケット完売画面」を優先します。
+         * "today"     -> 【本日開催】手動でこれにすると、強制的に「当日券の案内」を表示します。
+         * "ended"     -> 【公演終了】手動でこれにすると、強制的に「終了メッセージ」を表示します。
          */
-        const pageMode = "countdown"; 
+        let pageMode = "countdown"; 
 
 
-        // --- 以下は自動で動くプログラムです（触らなくて大丈夫です！） ---
+        // --- 以下は自動で動くプログラムです ---
         const msgBox = document.getElementById("status-message");
         const timerArea = document.getElementById("timer-area");
         const bookingBtn = document.getElementById("booking-btn");
         const soldoutFooter = document.getElementById("soldout-footer");
 
-        // ページモードに応じた表示の切り替え
-        if (pageMode === "soldout") {
-            // タイマーと予約ボタンを隠す
-            timerArea.style.display = "none";
-            bookingBtn.style.display = "none";
-            
-            // 特設の可愛い完売案内を上部と下部に出す
-            msgBox.className = "announcement-box soldout";
-            msgBox.innerHTML = "<span class='soldout-title'> 予定枚数は終了いたしました </span><span class='soldout-sub'>満員御礼！たくさんのご予約ありがとうございました。</span>";
-            soldoutFooter.style.display = "inline-block";
-            
-        } else if (pageMode === "today") {
-            timerArea.style.display = "none";
-            soldoutFooter.style.display = "none";
-            msgBox.className = "announcement-box today";
-            msgBox.innerHTML = "本日開催！<br>ゆめりあホール6階にて当日券を販売しております。";
-            
-        } else if (pageMode === "ended") {
-            timerArea.style.display = "none";
-            bookingBtn.style.display = "none";
-            soldoutFooter.style.display = "none";
-            msgBox.className = "announcement-box ended";
-            msgBox.innerHTML = "公演は終了いたしました。<br>ご来場くださり、誠にありがとうございました！";
-            
+        // 📅 自動切り替え用のターゲット日時
+        const todayStartTime = new Date("September 5, 2026 00:00:00").getTime(); // 本日開催モード（9/5 0:00）
+        const concertEndTime = new Date("September 5, 2026 15:45:00").getTime(); // 公演終了モード（9/5 15:45）
+
+        // 画面表示を一括制御する共通関数
+        const renderPage = (mode) => {
+            if (mode === "soldout") {
+                timerArea.style.display = "none";
+                bookingBtn.style.display = "none";
+                msgBox.className = "announcement-box soldout";
+                msgBox.innerHTML = "<span class='soldout-title'> 予定枚数は終了いたしました </span><span class='soldout-sub'>満員御礼！たくさんのご予約ありがとうございました。</span>";
+                soldoutFooter.style.display = "inline-block";
+                
+            } else if (mode === "today") {
+                timerArea.style.display = "none";
+                bookingBtn.style.display = "inline-block"; // 当日券確認用として一応ボタンは残します
+                soldoutFooter.style.display = "none";
+                msgBox.className = "announcement-box today";
+                msgBox.innerHTML = "本日開催！<br>ゆめりあホール6階にて当日券を販売しております。";
+                
+            } else if (mode === "ended") {
+                timerArea.style.display = "none";
+                bookingBtn.style.display = "none";
+                soldoutFooter.style.display = "none";
+                msgBox.className = "announcement-box ended";
+                msgBox.innerHTML = "公演は終了いたしました。<br>ご来場くださり、誠にありがとうございました！";
+            }
+        };
+
+        // ⏰ ページ読み込み瞬間の日時判定（チラつき防止対策）
+        const nowTime = new Date().getTime();
+        if (pageMode === "countdown") {
+            if (nowTime >= concertEndTime) {
+                pageMode = "ended";
+            } else if (nowTime >= todayStartTime) {
+                pageMode = "today";
+            }
+        }
+
+        // 判定されたモードを即座に画面へ反映
+        if (pageMode !== "countdown") {
+            renderPage(pageMode);
         } else {
             // 通常のカウントダウンタイマーの処理
             soldoutFooter.style.display = "none";
             const concertDate = new Date("September 5, 2026 12:30:00").getTime();
+            
             const updateTimer = () => {
                 const now = new Date().getTime();
+                
+                // リアルタイム監視と自動切り替え
+                if (now >= concertEndTime) {
+                    renderPage("ended");
+                    clearInterval(timerInterval);
+                    return;
+                } else if (now >= todayStartTime) {
+                    renderPage("today");
+                    clearInterval(timerInterval);
+                    return;
+                }
+
+                // カウントダウンの残時間計算
                 const diff = concertDate - now;
                 if (diff > 0) {
                     const d = Math.floor(diff / (1000 * 60 * 60 * 24));
@@ -459,14 +491,9 @@
                     document.getElementById("hours").innerText = h.toString().padStart(2, '0');
                     document.getElementById("mins").innerText = m.toString().padStart(2, '0');
                     document.getElementById("secs").innerText = s.toString().padStart(2, '0');
-                } else {
-                    timerArea.style.display = "none";
-                    bookingBtn.style.display = "none";
-                    msgBox.className = "announcement-box ended";
-                    msgBox.innerHTML = "公演は終了いたしました。ご来場くださり、誠にありがとうございました！";
                 }
             };
-            setInterval(updateTimer, 1000);
+            const timerInterval = setInterval(updateTimer, 1000);
             updateTimer();
         }
 
