@@ -270,6 +270,35 @@
             background-color: #be123c;
             transform: scale(1.05);
         }
+
+        /* 🐱 ボタン下用の動物とお知らせ枠デザイン（修正版） */
+        .footer-info-area {
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            gap: 12px;
+            margin-top: 25px;
+            background-color: rgba(255, 255, 255, 0.15); /* 白背景に溶け込む透明感のある枠 */
+            padding: 10px 25px;
+            border-radius: 30px;
+            border: 2px dashed rgba(255, 255, 255, 0.5); /* 白いステッチの枠線 */
+        }
+        .footer-balloon {
+            color: #ffffff; /* 連絡先と同じシンプルな白文字 */
+            font-size: 1.1rem;
+        }
+        .footer-balloon .highlight {
+            color: #fff9c4; /* 日時だけやさしい黄色に */
+            font-weight: bold;
+            font-size: 1.15rem;
+            border-bottom: 2px dotted #fff9c4; /* ステッチ（点線）の下線 */
+            padding-bottom: 2px;
+            display: inline-block;
+        }
+        .footer-animal {
+            font-size: 1.8rem;
+            line-height: 1;
+        }
     </style>
 </head>
 <body>
@@ -372,7 +401,7 @@
                 <details>
                     <summary><span>🎻 北島 綾乃（ヴィオラ）</span></summary>
                     <div class="profile-content">
-                        国立音楽大学音楽学部器楽学科卒業。その後ヴィオラに転向。現在は室内楽, オーケストラ、ファミリーコンサート、アーティストのサポート、音楽教室講師など多方面で活躍中。
+                        国立音楽大学音楽学部器楽学科卒業。その後ヴィオラに転向。現在は室内楽、オーケストラ、ファミリーコンサート、アーティストのサポート、音楽教室講師など多方面で活躍中。
                     </div>
                 </details>
 
@@ -397,6 +426,13 @@
             <a href="https://docs.google.com/forms/d/e/1FAIpQLScLtd5jUhDG_63vJ22cnKk7jyGKHp0vPzWA3YcMrWk7EgEeZg/viewform?usp=header" target="_blank" class="btn" id="booking-btn">
                 Googleフォームで予約する <i class="fa-solid fa-file-lines"></i>
             </a>
+            
+            <br>
+            <div id="ticket-deadline-box" class="footer-info-area">
+                
+                <div class="footer-balloon">前売り券は <span class="highlight">9月4日 16:00</span> まで販売♪</div>
+            </div>
+
             <div id="soldout-footer" class="soldout-footer-box"> 予定枚数は終了いたしました（満員御礼）</div>
         </div>
     </footer>
@@ -405,12 +441,12 @@
         /* =======================================================
          * ⚙️ ホームページの表示設定（状況に応じて切り替えるスイッチ）
          * =======================================================
-         * "countdown" -> 通常時（日時に応じて自動で本日開催や終了モードに切り替わります！）
+         * "countdown" -> 【通常時】2026/9/5 0:00になると自動で"today"（本日開催）、15:45に"ended"（公演終了）に切り替わります！
          * "soldout"   -> 【完売時】手動でこれにすると、日時に関わらず「チケット完売画面」を優先します。
-         * "today"     -> 【本日開催】手動でこれにすると、強制的に「当日券の案内」を表示します。
-         * "ended"     -> 【公演終了】手動でこれにすると、強制的に「終了メッセージ」を表示します。
+         * "today"     -> 【本日開催】手動でこれにすると「当日券の案内」を表示します。
+         * "ended"     -> 【公演終了】手動でこれにすると「終了メッセージ」を表示します。
          */
-        let pageMode = "countdown"; 
+        const pageMode = "countdown"; 
 
 
         // --- 以下は自動で動くプログラムです ---
@@ -418,6 +454,7 @@
         const timerArea = document.getElementById("timer-area");
         const bookingBtn = document.getElementById("booking-btn");
         const soldoutFooter = document.getElementById("soldout-footer");
+        const deadlineBox = document.getElementById("ticket-deadline-box");
 
         // 📅 自動切り替え用のターゲット日時
         const todayStartTime = new Date("September 5, 2026 00:00:00").getTime(); // 本日開催モード（9/5 0:00）
@@ -428,13 +465,15 @@
             if (mode === "soldout") {
                 timerArea.style.display = "none";
                 bookingBtn.style.display = "none";
+                if(deadlineBox) deadlineBox.style.display = "none"; // 完売時は前売り告知を非表示
                 msgBox.className = "announcement-box soldout";
                 msgBox.innerHTML = "<span class='soldout-title'> 予定枚数は終了いたしました </span><span class='soldout-sub'>満員御礼！たくさんのご予約ありがとうございました。</span>";
                 soldoutFooter.style.display = "inline-block";
                 
             } else if (mode === "today") {
                 timerArea.style.display = "none";
-                bookingBtn.style.display = "inline-block"; // 当日券確認用として一応ボタンは残します
+                bookingBtn.style.display = "inline-block"; 
+                if(deadlineBox) deadlineBox.style.display = "none"; // 当日は前売り告知を非表示
                 soldoutFooter.style.display = "none";
                 msgBox.className = "announcement-box today";
                 msgBox.innerHTML = "本日開催！<br>ゆめりあホール6階にて当日券を販売しております。";
@@ -442,6 +481,7 @@
             } else if (mode === "ended") {
                 timerArea.style.display = "none";
                 bookingBtn.style.display = "none";
+                if(deadlineBox) deadlineBox.style.display = "none"; // 終了後は前売り告知を非表示
                 soldoutFooter.style.display = "none";
                 msgBox.className = "announcement-box ended";
                 msgBox.innerHTML = "公演は終了いたしました。<br>ご来場くださり、誠にありがとうございました！";
@@ -452,13 +492,13 @@
         const nowTime = new Date().getTime();
         if (pageMode === "countdown") {
             if (nowTime >= concertEndTime) {
-                pageMode = "ended";
+                renderPage("ended");
             } else if (nowTime >= todayStartTime) {
-                pageMode = "today";
+                renderPage("today");
             }
         }
 
-        // 判定されたモードを即座に画面へ反映
+        // 判定されたモードを即座に画面へ反映（countdown以外の場合）
         if (pageMode !== "countdown") {
             renderPage(pageMode);
         } else {
